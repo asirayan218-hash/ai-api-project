@@ -1,26 +1,18 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, Header, HTTPException
 
-app = FastAPI(title="Ayan AI API", version="1.0")
+app = FastAPI()
 
-class PromptRequest(BaseModel):
-    prompt: str
+# Ek secret API key (jo sirf tumhare pas ho ya RapidAPI ke pass ho)
+MY_SECRET_KEY = "ayan_secret_api_key_123"
 
 @app.get("/")
 def home():
-    return {"message": "Ayan AI API is live and running!"}
+    return {"message": "AI API is live!"}
 
-@app.post("/v1/chat/completions")
-def chat_completion(data: PromptRequest):
-    user_query = data.prompt
-    response_text = f"Ayan AI processed your prompt: '{user_query}'. Commercial scale API is ready!"
+@app.get("/predict")
+def predict(x_key: str = Header(None)):
+    if x_key != MY_SECRET_KEY:
+        raise HTTPException(status_code=403, detail="Unauthorized! Invalid or missing API Key.")
     
-    return {
-        "model": "ayan-ai-v1",
-        "choices": [{
-            "message": {
-                "role": "assistant",
-                "content": response_text
-            }
-        }]
-    }
+    # Yahan tumhara AI model ka code aayega
+    return {"result": "AI processing successful!"}
